@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "homepage": "https://kirill25460.github.io/test-vell-it",
+  "homepage": "https://kirill25460.github.io/Test-Vell_IT/",
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
