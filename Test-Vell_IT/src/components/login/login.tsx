@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Toaster, toast } from 'sonner';
 import { NavLink, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useDispatch, useSelector } from 'react-redux';
+import {  useSelector } from 'react-redux';
+import { useAppDispatch } from '../../redux/hooks';
 import { loginThunk, getUserThunk } from '../../redux/auth/authActions';
 import { RootState } from "../../redux/store";
 const schema = z.object({
@@ -30,7 +31,7 @@ type FormData = z.infer<typeof schema>;
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const loading = useSelector((state: RootState) => state.auth.loading); 
@@ -38,11 +39,8 @@ const LoginForm = () => {
 
 
 
-  const handleTogglePassword = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowPassword(!showPassword); 
-  };
+  const handleTogglePassword = () => setShowPassword(!showPassword);
+
   const {
     register,
     handleSubmit,
@@ -89,7 +87,7 @@ const LoginForm = () => {
         <label htmlFor="password" className="block text-gray-700">Password</label>
         <input id="password"   type={showPassword ? 'text' : 'password'} {...register("password")} className="w-full p-2 border rounded" />
         {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-         <button type="button" onClick={(e) => handleTogglePassword(e)} className='absolute right-2 top-9 flex items-center justify-center bg-transparent border-none cursor-pointer'>
+          <button type="button" onClick={handleTogglePassword} className='absolute right-2 top-9 flex items-center justify-center bg-transparent border-none cursor-pointer'>
           {showPassword ? <FaEyeSlash /> : <FaEye />}
         </button>
       </div>

@@ -11,8 +11,9 @@ interface LoginResponse {
   accessToken: string;
 }
 interface User {
+  id?: string;
   username: string;
-  id: string;
+
 }
 const initialState: AuthState = {
   user: null,
@@ -55,8 +56,8 @@ const authSlice = createSlice({
         state.loading = true;
       })
       .addCase(getUserThunk.fulfilled, (state, action: PayloadAction<User>) => {
-        state.loading = false;
         state.user = action.payload; 
+        state.isAuth = true;
       })
       .addCase(getUserThunk.rejected, (state, action) => {
         state.loading = false;

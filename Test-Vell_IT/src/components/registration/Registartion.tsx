@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useForm } from "react-hook-form";
+import axios from 'axios';
 import { Toaster, toast } from 'sonner';
 import { z } from "zod";
 import { NavLink } from 'react-router-dom';
@@ -44,10 +45,11 @@ const Registration = () => {
       await registrationFoo(data);
       toast.success('Регистрация успешна!');
     } catch (error) {
-      console.error("Ошибка регистрации:", error);
-      const errorMessage = error.response?.data?.message 
+      const errorMessage =  (axios.isAxiosError(error) && error.response?.data?.message) ||
+      "Произошла ошибка. Попробуйте еще раз.";
+      console.error("Ошибка:", errorMessage);
       toast.error(errorMessage);
-    } finally {
+     } finally {
       setIsSubmitting(false);
     }
   };
@@ -73,7 +75,7 @@ const Registration = () => {
         <label htmlFor="password" className="block text-gray-700">Password</label>
         <input id="password"   type={showPassword ? 'text' : 'password'} {...register("password")} className="w-full p-2 border rounded" />
         {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-         <button type="button" onClick={(e) => handleTogglePassword(e)} className='absolute right-2 top-9 flex items-center justify-center bg-transparent border-none cursor-pointer'>
+         <button type="button" onClick={handleTogglePassword} className='absolute right-2 top-9 flex items-center justify-center bg-transparent border-none cursor-pointer'>
           {showPassword ? <FaEyeSlash /> : <FaEye />}
         </button>
       </div>
