@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { NavLink } from 'react-router-dom';
+import { Toaster, toast } from 'sonner';
+import { NavLink, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
-import { loginThunk } from '../../redux/auth/authActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginThunk, getUserThunk } from '../../redux/auth/authActions';
+import { RootState } from "../../redux/store";
 const schema = z.object({
   name: z
     .string()
@@ -29,6 +31,13 @@ type FormData = z.infer<typeof schema>;
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const loading = useSelector((state: RootState) => state.auth.loading); 
+  const error = useSelector((state: RootState) => state.auth.error);
+
+
+
   const handleTogglePassword = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -42,10 +51,21 @@ const LoginForm = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Форма отправлена:", data);
-    dispatch(loginThunk(data));
-    
+  const onSubmit = async (data: FormData) => {
+    try {
+      console.log("Форма отправлена:", data);
+
+      const result = await dispatch(loginThunk(data)).unwrap(); 
+  
+      if (result) {
+   
+        await dispatch(getUserThunk());
+        navigate("/user"); 
+      }
+    } catch (error) {
+      console.error("Ошибка при входе:", error);
+      toast.error("Ошибка входа. Проверьте свои данные!");
+    }
   };
 
   return (<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 items-center">
@@ -73,11 +93,12 @@ const LoginForm = () => {
           {showPassword ? <FaEyeSlash /> : <FaEye />}
         </button>
       </div>
-
+      {error && <p className="text-red-500 text-sm">{error}</p>}
       <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-        Log In
+      {loading ? "Loading..." : "Log In"}
       </button>
     </form>
+    <Toaster position="top-center" richColors />
     </div>
     </div>
   );

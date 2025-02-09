@@ -32,13 +32,12 @@ export const registrationFoo = async (credentials: Credentials): Promise<User> =
 // Логин
 export const loginFoo = async (credentials: Credentials): Promise<User> => {
   const { data } = await axios.post('/api/v1/auth/login', credentials);
-  
-  localStorage.setItem("accessToken", data.accessToken);
   return data;
 };
 
 // Получение текущего пользователя
 export const getCurrentUser = async (): Promise<User> => {
   const { data } = await axios.get('/api/v1/auth/me');
+  console.log(data)
   return data;
 };

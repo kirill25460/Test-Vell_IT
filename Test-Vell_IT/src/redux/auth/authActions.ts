@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginFoo ,token } from "../../services/API"; 
+import { loginFoo ,token, getCurrentUser} from "../../services/API"; 
+
 
 
 export const loginThunk = createAsyncThunk(
@@ -17,9 +18,19 @@ export const loginThunk = createAsyncThunk(
     }
   }
 );
+export const getUserThunk = createAsyncThunk(
+  "auth/getUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const user = await getCurrentUser();
+      return user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Ошибка получения данных пользователя");
+    }
+  }
+);
 
 
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
-  localStorage.removeItem("user");
   localStorage.removeItem("accessToken");
 });

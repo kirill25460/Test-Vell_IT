@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useForm } from "react-hook-form";
+import { Toaster, toast } from 'sonner';
 import { z } from "zod";
 import { NavLink } from 'react-router-dom';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,12 +27,9 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const Registration = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const handleTogglePassword = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowPassword(!showPassword); 
-  };
+  const handleTogglePassword = () => setShowPassword(!showPassword);
   const {
     register,
     handleSubmit,
@@ -40,9 +38,18 @@ const Registration = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Форма отправлена:", data);
-    registrationFoo(data)
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    try {
+      await registrationFoo(data);
+      toast.success('Регистрация успешна!');
+    } catch (error) {
+      console.error("Ошибка регистрации:", error);
+      const errorMessage = error.response?.data?.message 
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 items-center">
@@ -71,10 +78,11 @@ const Registration = () => {
         </button>
       </div>
 
-      <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-      Registration
+      <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600" disabled={isSubmitting}>
+      {isSubmitting ? "Регистрация..." : "Регистрация"}
       </button>
     </form>
+    <Toaster position="top-center" richColors />
     </div>
     </div>
   );

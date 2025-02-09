@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { loginThunk } from './authActions';
+import { loginThunk, getUserThunk  } from './authActions';
 interface AuthState {
-  user: string | null;
+  user:  User | null;
   accessToken: string | null;
   isAuth: boolean;
   loading: boolean;
@@ -10,12 +10,12 @@ interface AuthState {
 interface LoginResponse {
   accessToken: string;
 }
-interface ErrorResponse {
-  message: string;
-  code?: number;
+interface User {
+  username: string;
+  id: string;
 }
 const initialState: AuthState = {
-  user: localStorage.getItem("user"),
+  user: null,
   accessToken: localStorage.getItem("accessToken"),
   isAuth: !!localStorage.getItem("accessToken"),
   loading: false,
@@ -28,7 +28,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
       state.user = null;
       state.accessToken = null;
@@ -46,10 +45,22 @@ const authSlice = createSlice({
         state.loading = false;
         state.accessToken = action.payload.accessToken;
         state.isAuth = true;
+        localStorage.setItem("accessToken", action.payload.accessToken);
       })
-      .addCase(loginThunk.rejected, (state, action: PayloadAction<ErrorResponse>) => {
+      .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ? action.payload.message : 'Unknown error';
+        state.error = action.payload as string;
+      })
+      .addCase(getUserThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getUserThunk.fulfilled, (state, action: PayloadAction<User>) => {
+        state.loading = false;
+        state.user = action.payload; 
+      })
+      .addCase(getUserThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
