@@ -10,7 +10,7 @@ import "./index.css";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
-    <BrowserRouter basename="/test-vell-it/">
+    <BrowserRouter basename="/Test-Vell_IT/">
         <App />
       </BrowserRouter>
     </Provider>
