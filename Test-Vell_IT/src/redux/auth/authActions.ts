@@ -1,20 +1,26 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 import { loginFoo ,token, getCurrentUser} from "../../services/API"; 
-
 
 
 export const loginThunk = createAsyncThunk(
   "auth/login",
-  async (credentials: { name: string; username: string; password: string }, { rejectWithValue }) => {
+  async (
+    credentials: { name: string; username: string; password: string },
+    { rejectWithValue }
+  ) => {
     try {
-      const data  = await loginFoo(credentials);
+      const data = await loginFoo(credentials);
       token.set(data.accessToken);
       return data;
-    } catch (error:any) {
-      return rejectWithValue({
-        message: error.message || 'An error occurred',
-        code: error.code,
-      });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue({
+          message: error.response?.data?.message || "Ошибка входа",
+          code: error.response?.status,
+        });
+      }
+      return rejectWithValue({ message: "Неизвестная ошибка", code: 500 });
     }
   }
 );
@@ -25,7 +31,12 @@ export const getUserThunk = createAsyncThunk(
       const user = await getCurrentUser();
       return user;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Ошибка получения данных пользователя");
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(
+          error.response?.data?.message || "Ошибка получения данных пользователя"
+        );
+      }
+      return rejectWithValue("Неизвестная ошибка при получении данных пользователя");
     }
   }
 );
