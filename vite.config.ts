@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(),tailwindcss(), ghPages()],
-  base: 'TEST-Vell_IT',
+  base:  '/test-vell-it/',
 })
