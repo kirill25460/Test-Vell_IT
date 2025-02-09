@@ -56,6 +56,7 @@ const authSlice = createSlice({
         state.loading = true;
       })
       .addCase(getUserThunk.fulfilled, (state, action: PayloadAction<User>) => {
+        state.loading = false;
         state.user = action.payload; 
         state.isAuth = true;
       })
